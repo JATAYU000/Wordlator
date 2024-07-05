@@ -1,0 +1,2 @@
+# Wordlator
+automated wordle solver
