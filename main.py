@@ -4,20 +4,19 @@ from selenium.webdriver.common.by import By
 from pyautogui import press, typewrite, hotkey
 import mysql.connector as sq
 import pickle
+from PIL import Image
+from io import BytesIO
 global con,dictionary
+position = {"00":[800,390],"01":[865,390],"02":[931,390],"03":[1000,390],"04":[1065,390],
+            "10":[800,456],"11":[865,456],"12":[931,456],"13":[1000,456],"14":[1065,456],
+            "20":[800,527],"21":[865,527],"22":[931,527],"23":[1000,527],"24":[1065,527],
+            "30":[800,593],"31":[865,593],"32":[931,593],"33":[1000,593],"34":[1065,593],
+            "40":[800,662],"41":[865,662],"42":[931,662],"43":[1000,662],"44":[1065,662],
+            "50":[800,731],"51":[865,731],"52":[931,731],"53":[1000,731],"54":[1065,731]}
+rgb = {"green":(83,141,78,255),"yellow":(181, 159, 59, 255),"grey":(58, 58, 60, 255)}
 
-def Initialize():
-    psswrd = input("Enter password: ")
-    con = sq.connect(host = 'localhost', user = 'jatayu', password = psswrd, database = 'wordle_crack' )
-    print(con)
-    f = open('pw_list.dat','rb')
-    try:
-        while True:
-            dictionary = pickle.load(f)
-    except:
-        f.close()
 
-def is_database_empty():
+def is_database_empty(con):
     c1 = con.cursor()
     c1.execute('select count(*) from word_list')
     test = c1.fetchall()
@@ -25,9 +24,10 @@ def is_database_empty():
         for k in l:
             return k
 
-def no_letters():
+def no_letters(con):
     s = input('Enter the letter(s) not present in the word : ')
-    k = is_database_empty()
+    k = is_database_empty(con)
+    print(1234)
     if k == 0:
         o = ''
         p = 0
@@ -52,8 +52,8 @@ def no_letters():
 
     free_dict()
 
-def yes_letters(t):
-    k = is_database_empty()
+def yes_letters(t,con):
+    k = is_database_empty(con)
     if k == 0:
         o = ''
         p = 0
@@ -87,7 +87,7 @@ def free_dict():
     except:
         pass
 
-def out_pos_letter():
+def out_pos_letter(con):
     d = {}
     t = []
     s = input('Enter the letter(s) where they are out of positions ( _ where letter not known) : ')
@@ -95,7 +95,7 @@ def out_pos_letter():
         d[i] = s[i]
         if s[i] != '_':
             t.append(s[i])      
-    yes_letters(t)
+    yes_letters(t,con)
 
     for x in d:
         if d[x] == '_':
@@ -103,27 +103,27 @@ def out_pos_letter():
         else:
             if x == 0:
                 c = d[0]+'____'
-                y_d(c)
+                y_d(c,con)
             elif x == 1:
                 c = '_'+d[1]+'___'
-                y_d(c)
+                y_d(c,con)
             elif x == 2:
                 c = '__'+d[2]+'__'
-                y_d(c)
+                y_d(c,con)
             elif x == 3:
                 c = '___'+d[3]+'_'
-                y_d(c)
+                y_d(c,con)
             else:
                 c = '____'+d[4]
-                y_d(c)
+                y_d(c,con)
 
-def y_d(c):
+def y_d(c,con):
     qry78 = 'delete from word_list where words like %s'
     c700 = con.cursor()
     c700.execute(qry78,(c,))
 
-def pos_letters():
-    k = is_database_empty()
+def pos_letters(con):
+    k = is_database_empty(con)
     if k == 0:
         print('\nPlease complete either option 1 or 2')
     else:
@@ -133,14 +133,14 @@ def pos_letters():
         c8.execute(qry3,(s,))
 
 
-def suggest_word():
-    k = is_database_empty()
+def suggest_word(con):
+    k = is_database_empty(con)
     if k == 0:
         print('RATES or SALET')
     else:
-        s_l_w()
+        s_l_w(con)
 
-def s_l_w():
+def s_l_w(con):
     global wer
     qry4 = 'select * from word_list'
     c10 = con.cursor()
@@ -155,15 +155,21 @@ def s_l_w():
     del lol
     ind_count(wer)
 
-def quit_p():
-    k = is_database_empty() 
+def quit_p(con):
+    k = is_database_empty(con) 
     if k != 0:
-        clear_data()
+        clear_data(con)
         print('\nTHANK YOU FOR USING THE PROGRAM')
         exit()
     else:
         print('\nTHANK YOU FOR USING THE PROGRAM')
         exit()
+
+def clear_data(con):
+    c20 = con.cursor()
+    c20.execute('delete from word_list')
+    con.commit()
+    print('\nDATABASE CLEARED SUCESSFULLY')
 
 def ind_count(wer):
     global pos_d
@@ -224,8 +230,8 @@ def display_sugg_words(disp,max_index):
         if w[1] == 5 or w[1] == 4 or w[1] == max(max_index):
             print(w)
 
-def check_if_database_is_empty():
-    k = is_database_empty()
+def check_if_database_is_empty(con):
+    k = is_database_empty(con)
     if k != 0:
         c = con.cursor()
         c.execute('delete from word_list')
@@ -249,20 +255,59 @@ def CloseInitialWindow(driver):
     button.click()
     time.sleep(1)
 
-def EnterWord(driver):
-    press('c')
-    press('r')
-    press('u')
-    press('s')
-    press('h')
-    time.sleep(1)
+def EnterWord(word,driver):
+    press(word[0])
+    press(word[1])
+    press(word[2])
+    press(word[3])
+    press(word[4])
+    hotkey('enter')
+    time.sleep(2)
     return
+
+def AnalyzeEntry(driver,row,word):
+    word = word.upper()
+    green = ""
+    yellow = ""
+    grey = ""
+    img = driver.get_screenshot_as_png()
+    img = Image.open(BytesIO(img)) 
+    for i in range(0,5):
+        px = img.getpixel(position[str(row)+str(i)])
+        if px == rgb['green']:
+            green += word[i]
+            yellow +="_"
+        elif px == rgb['yellow']:
+            yellow += word[i]
+            green+="_"
+        elif px == rgb['grey']:
+            grey = grey + word[i]
+            green+='_'
+            yellow+="_"
+    print(green,yellow,grey,sep=",")
+    return(green,yellow,grey)
 
 def main():
     # entry point
-    # driver = launchBrowser()
-    # CloseInitialWindow(driver=driver)
-    Initialize()
+    driver = launchBrowser()
+    CloseInitialWindow(driver=driver)
+    EnterWord('stuff',driver)
+    AnalyzeEntry(driver,0,'stuff')
+    
+    
+    
+    # psswrd = input("Enter mysql password: ")
+    # con = sq.connect(host = 'localhost', user = 'jatayu', password = psswrd, database = 'wordle_crack' )
+    # print(con)
+    # f = open('Wordlator/pw_list.dat','rb')
+    # try:
+    #     while True:
+    #         dictionary = pickle.load(f)
+    # except:
+    #     f.close()
+    # no_letters(con)
+    # pos_letters(con)
+    # suggest_word(con)
 
     return
     
