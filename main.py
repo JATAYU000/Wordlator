@@ -289,8 +289,17 @@ def AnalyzeEntry(driver,row,word):
 
 def main():
     # entry point
+    global position
     driver = launchBrowser()
     CloseInitialWindow(driver=driver)
+    w = driver.get_window_size()['width']/2
+    print(driver.get_window_size())
+    position = {"00":[w-160,390],"01":[w-95,390],"02":[w-29,390],"03":[w+40,390],"04":[w+105,390],
+            "10":[w-160,456],"11":[w-95,456],"12":[w-29,456],"13":[w+40,456],"14":[w+105,456],
+            "20":[w-160,527],"21":[w-95,527],"22":[w-29,527],"23":[w+40,527],"24":[w+105,527],
+            "30":[w-160,593],"31":[w-95,593],"32":[w-29,593],"33":[w+40,593],"34":[w+105,593],
+            "40":[w-160,662],"41":[w-95,662],"42":[w-29,662],"43":[w+40,662],"44":[w+105,662],
+            "50":[w-160,731],"51":[w-95,731],"52":[w-29,731],"53":[w+40,731],"54":[w+105,731]}
     EnterWord('stuff',driver)
     AnalyzeEntry(driver,0,'stuff')
     
