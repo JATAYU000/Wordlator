@@ -4,7 +4,7 @@ import mysql.connector as sq
 
 j = input('Enter your sql password : ')
 
-con = sq.connect(host = 'localhost', user = 'root', password = j)
+con = sq.connect(host = 'localhost', user = 'jatayu', password = j)
 
 c1 = con.cursor()
 h = 'create database wordle_crack'
