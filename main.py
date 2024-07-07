@@ -18,8 +18,10 @@ position = {"00":[800,390],"01":[865,390],"02":[931,390],"03":[1000,390],"04":[1
 # rgb values of green, yellow and grey
 rgb = {"green":(83,141,78,255),"yellow":(181, 159, 59, 255),"grey":(58, 58, 60, 255)}
 
+# avoid dulpicate entry in grey
+GndY = ""
 
-def is_database_empty(con):
+def isDatabaseEmpty(con):
     c1 = con.cursor()
     c1.execute('select count(*) from word_list')
     test = c1.fetchall()
@@ -27,8 +29,8 @@ def is_database_empty(con):
         for k in l:
             return k
 
-def no_letters(con,s):
-    k = is_database_empty(con)
+def LettersNotInWord(con,s):
+    k = isDatabaseEmpty(con)
     if k == 0:
         o = ''
         p = 0
@@ -50,11 +52,10 @@ def no_letters(con,s):
             l = '%'+y
             m = (j,k,l)
             c3.execute(qry2,m)
-
-    free_dict()
+    FreeDictionary()
 
 def yes_letters(t,con):
-    k = is_database_empty(con)
+    k = isDatabaseEmpty(con)
     if k == 0:
         o = ''
         p = 0
@@ -79,16 +80,16 @@ def yes_letters(t,con):
             m = (j,k,l,a,b)
             c3.execute(qry2,m)
 
-    free_dict()
+    FreeDictionary()
 
 
-def free_dict():
+def FreeDictionary():
     try:
         del dictionary
     except:
         pass
 
-def out_pos_letter(con,s):
+def LettersInWrongPosition(con,s):
     if s == "_____": return
     d = {}
     t = []
@@ -123,8 +124,8 @@ def y_d(c,con):
     c700 = con.cursor()
     c700.execute(qry78,(c,))
 
-def pos_letters(con,s):
-    k = is_database_empty(con)
+def LettersInCorrectPosition(con,s):
+    k = isDatabaseEmpty(con)
     if k == 0:
         pass
     else:
@@ -133,8 +134,8 @@ def pos_letters(con,s):
         c8.execute(qry3,(s,))
 
 
-def suggest_word(con):
-    k = is_database_empty(con)
+def SuggestWord(con):
+    k = isDatabaseEmpty(con)
     if k == 0:
         return [('rates',0)]
     else:
@@ -148,24 +149,14 @@ def s_l_w(con):
     lol = c10.fetchall()
     wer = []
     if len(lol) == 1:
-        return [lol[0]]
-        # quit_p()
+        return [(lol[0][0],5)]
     for e in range(len(lol)):
         wer.append((lol[e][0]))
     del lol
     return ind_count(wer)
 
-def quit_p(con):
-    k = is_database_empty(con) 
-    if k != 0:
-        clear_data(con)
-        print('\nTHANK YOU FOR USING THE PROGRAM')
-        exit()
-    else:
-        print('\nTHANK YOU FOR USING THE PROGRAM')
-        exit()
 
-def clear_data(con):
+def ClearData(con):
     c20 = con.cursor()
     c20.execute('delete from word_list')
     con.commit()
@@ -230,7 +221,7 @@ def make_word(q):
 
 
 def check_if_database_is_empty(con):
-    k = is_database_empty(con)
+    k = isDatabaseEmpty(con)
     if k != 0:
         c = con.cursor()
         c.execute('delete from word_list')
@@ -265,6 +256,7 @@ def EnterWord(word,driver):
     return
 
 def AnalyzeEntry(driver,con,row,word):
+    global GndY
     word = word.upper()
     green = ""
     yellow = ""
@@ -276,23 +268,26 @@ def AnalyzeEntry(driver,con,row,word):
         if px == rgb['green']:
             green += word[i]
             yellow +="_"
+            GndY +=word[i]
         elif px == rgb['yellow']:
             yellow += word[i]
             green+="_"
+            GndY +=word[i]
         elif px == rgb['grey']:
-            grey = grey + word[i]
+            if(word[i] not in GndY):
+                grey = grey + word[i]
             green+='_'
             yellow+="_"
     if "_" not in green:
         return "completed"
-    no_letters(con,grey)
-    pos_letters(con,green)
-    out_pos_letter(con,yellow)
-    words = suggest_word(con)
+    LettersNotInWord(con,grey)
+    LettersInCorrectPosition(con,green)
+    LettersInWrongPosition(con,yellow)
+    words = SuggestWord(con)
     ind=0
     for i in range(len(words)):
-        if word[ind]>word[i]:ind = i
-    return words[i][0]
+        if words[ind][1]<words[i][1]:ind = i
+    return words[ind][0]
 
 def Login(driver,username,pasword):
     return
