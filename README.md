@@ -1,5 +1,7 @@
 # Wordlator
 automated wordle solver using selenium and mysql
+## Features used from:
+[This Repository](https://github.com/570RMBR3AK3R/Wordle-Brute)
 
 ## Setup
 run this script with sudo after changing your hostname
