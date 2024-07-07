@@ -54,7 +54,7 @@ def LettersNotInWord(con,s):
             c3.execute(qry2,m)
     FreeDictionary()
 
-def yes_letters(t,con):
+def YellowLettersPermutation(t,con):
     k = isDatabaseEmpty(con)
     if k == 0:
         o = ''
@@ -97,7 +97,7 @@ def LettersInWrongPosition(con,s):
         d[i] = s[i]
         if s[i] != '_':
             t.append(s[i])      
-    yes_letters(t,con)
+    YellowLettersPermutation(t,con)
 
     for x in d:
         if d[x] == '_':
@@ -105,21 +105,21 @@ def LettersInWrongPosition(con,s):
         else:
             if x == 0:
                 c = d[0]+'____'
-                y_d(c,con)
+                DeleteWordWithPermutation(c,con)
             elif x == 1:
                 c = '_'+d[1]+'___'
-                y_d(c,con)
+                DeleteWordWithPermutation(c,con)
             elif x == 2:
                 c = '__'+d[2]+'__'
-                y_d(c,con)
+                DeleteWordWithPermutation(c,con)
             elif x == 3:
                 c = '___'+d[3]+'_'
-                y_d(c,con)
+                DeleteWordWithPermutation(c,con)
             else:
                 c = '____'+d[4]
-                y_d(c,con)
+                DeleteWordWithPermutation(c,con)
 
-def y_d(c,con):
+def DeleteWordWithPermutation(c,con):
     qry78 = 'delete from word_list where words like %s'
     c700 = con.cursor()
     c700.execute(qry78,(c,))
@@ -139,9 +139,9 @@ def SuggestWord(con):
     if k == 0:
         return [('rates',0)]
     else:
-        return s_l_w(con)
+        return SelectWordFromDatabase(con)
 
-def s_l_w(con):
+def SelectWordFromDatabase(con):
     global wer
     qry4 = 'select * from word_list'
     c10 = con.cursor()
@@ -153,7 +153,7 @@ def s_l_w(con):
     for e in range(len(lol)):
         wer.append((lol[e][0]))
     del lol
-    return ind_count(wer)
+    return CountIndex(wer)
 
 
 def ClearData(con):
@@ -162,7 +162,7 @@ def ClearData(con):
     con.commit()
     print('\nDATABASE CLEARED SUCESSFULLY')
 
-def ind_count(wer):
+def CountIndex(wer):
     global pos_d
     pos_d = {}
     for d in wer: 
@@ -173,9 +173,9 @@ def ind_count(wer):
                 pos_d[j] = [0,0,0,0,0]
                 pos_d[j][i] += 1
 
-    return get_word_by_pos(pos_d)
+    return GetWordByPos(pos_d)
 
-def get_word_by_pos(pos_d):
+def GetWordByPos(pos_d):
     pars_d = ()
     for y in range(5):
         top = len(pos_d)
@@ -192,9 +192,9 @@ def get_word_by_pos(pos_d):
             if top == 0:
                 pars_d = pars_d + (l[0][0],)
                 
-    return make_word(pars_d)
+    return MakeWord(pars_d)
 
-def make_word(q):
+def MakeWord(q):
     disp = []
     max_index = []
     for g in wer:
@@ -220,12 +220,7 @@ def make_word(q):
     return out
 
 
-def check_if_database_is_empty(con):
-    k = isDatabaseEmpty(con)
-    if k != 0:
-        c = con.cursor()
-        c.execute('delete from word_list')
-        con.commit()
+
 
 def launchBrowser():
     options = webdriver.ChromeOptions()
